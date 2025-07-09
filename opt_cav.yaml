@@ -1,0 +1,24 @@
+strict: false
+max_evaluations: 3200
+
+generator:
+  name: cnsga
+  population_size: 64
+  output_path: temp
+
+evaluator:
+  function: lec_opt.opt
+  function_kwargs: {}
+
+vocs:
+  variables:
+    phase: [-0.1, 0.1]
+    phase3: [0.4, 0.6]
+    voltage: [750, 900]
+    voltage3: [1.2, 1.5]
+  constraints:
+    n_alive: [GREATER_THAN, 9000.0]
+  objectives:
+    gamma_error: MINIMIZE
+    energy_spread: MINIMIZE
+  constants: {}
