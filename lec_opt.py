@@ -70,7 +70,8 @@ def opt(inputs: dict) -> dict:
 def test(inputs: dict) -> dict:
     return {
         'gamma_error': 0.01,
-        'sigma_energy': 0.05,
+        'energy_spread': 0.05,
+        'sigma_energy': 6e5,
         'mean_gamma': 25.4,
         'n_alive': 10000
     }
@@ -80,8 +81,8 @@ def main():
     test_inputs = {
         'phase': 0.0,
         'phase3': 0.5,
-        'voltage': 8e5*16,
-        'voltage3': 1
+        'voltage': 800e3,
+        'voltage3': 400e3
     }
     
     print("Testing O_CAV optimization:")

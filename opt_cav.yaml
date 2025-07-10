@@ -14,8 +14,8 @@ vocs:
   variables:
     phase: [-0.1, 0.1]
     phase3: [0.4, 0.6]
-    voltage: [750, 900]
-    voltage3: [1.2, 1.5]
+    voltage: [750, 900] # 800kV
+    voltage3: [300, 500] # 400kV
   constraints:
     n_alive: [GREATER_THAN, 9000.0]
   objectives:
