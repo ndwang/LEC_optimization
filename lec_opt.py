@@ -61,7 +61,7 @@ def opt(inputs: dict) -> dict:
         'energy_spread': energy_spread,
         'sigma_energy': sigma_energy,
         'mean_gamma': mean_gamma,
-        'n_alive': P['n_alive'],
+        'n_alive_ratio': P['n_alive']/P['n_particle'],
         'ID': ID
     }
 
@@ -73,7 +73,7 @@ def test(inputs: dict) -> dict:
         'energy_spread': 0.05,
         'sigma_energy': 6e5,
         'mean_gamma': 25.4,
-        'n_alive': 10000
+        'n_alive_ratio': 1.0
     }
 
 def main():
@@ -94,7 +94,7 @@ def main():
     print(f"- Target mean_gamma: 25.4 (current: {result['mean_gamma']:.3f})")
     print(f"- Gamma error: {result['gamma_error']:.6f}")
     print(f"- Sigma energy: {result['sigma_energy']:.6f}")
-    print(f"- Particles alive: {result['n_alive']}")
+    print(f"- Particles alive ratio: {result['n_alive_ratio']}")
 
 if __name__=='__main__':
     main()

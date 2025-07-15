@@ -12,12 +12,12 @@ evaluator:
 
 vocs:
   variables:
-    phase: [-0.1, 0.1]
+    phase: [-0.03, 0.03]
     phase3: [0.4, 0.6]
-    voltage: [750, 900] # 800kV
-    voltage3: [300, 500] # 400kV
+    voltage: [780e3, 880e3] # 800kV
+    voltage3: [350e3, 460e3] # 400kV
   constraints:
-    n_alive: [GREATER_THAN, 9000.0]
+    n_alive_ratio: [GREATER_THAN, 0.95]
   objectives:
     gamma_error: MINIMIZE
     energy_spread: MINIMIZE
