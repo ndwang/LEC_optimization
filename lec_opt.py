@@ -14,14 +14,13 @@ def get_param_id(params: dict) -> str:
     return hashlib.md5(param_str.encode()).hexdigest()
     
 ############### tracking functions ###############
-def track(input, ID):
+def track(input, ID, commands):
     FILENAME = BASE_PATH + RELATIVE_PATH + ID
     
     # Check for duplicate
     if os.path.isfile(f"{FILENAME}.h5"):
         return ParticleGroup(f"{FILENAME}.h5")
-        
-    commands = f"set global lattice_calc_on = F\n set ele O_CAV phase = {input['phase']}\n set ele O_CAV phase3 = {input['phase3']}\n set ele O_CAV voltage = {input['voltage']}\n set ele O_CAV voltage3 = {input['voltage3']}\n set global lattice_calc_on = T\n set global track_type = beam\n write beam -at H3.END {FILENAME}.h5\n exit"
+                
     f = open(f"{FILENAME}.tao", "w")
     f.write(commands)
     f.close()
@@ -32,7 +31,7 @@ def track(input, ID):
     return ParticleGroup(f"{FILENAME}.h5")
 
 ############### evaluator functions ###############
-def objective_calc(P):
+def objective_cav(P):
     # Target gamma is 25.4
     target_gamma = 25.4
     mean_gamma = P['mean_gamma']
@@ -44,17 +43,29 @@ def objective_calc(P):
     
     return gamma_error, energy_spread, sigma_energy, mean_gamma
 
+def objective_sol(P):
+    return P['norm_emit_x'], P['norm_emit_y']
 
 ############### top level functions ###############
-def opt(inputs: dict) -> dict:
+def opt_cav(inputs: dict) -> dict:
     # Generate unique ID for this parameter set
     ID = get_param_id(inputs)
     
+    commands = f"""set global lattice_calc_on = F
+set ele O_CAV phase = {inputs['phase']}
+set ele O_CAV phase3 = {inputs['phase3']}
+set ele O_CAV voltage = {inputs['voltage']}
+set ele O_CAV voltage3 = {inputs['voltage3']}
+set global lattice_calc_on = T
+set global track_type = beam
+write beam -at H3.END {BASE_PATH + RELATIVE_PATH + ID}.h5
+exit"""
+    
     # Track the beam
-    P = track(inputs, ID)
+    P = track(inputs, ID, commands)
     
     # Calculate objectives
-    gamma_error, energy_spread, sigma_energy, mean_gamma = objective_calc(P)
+    gamma_error, energy_spread, sigma_energy, mean_gamma = objective_cav(P)
     
     return {
         'gamma_error': gamma_error,
@@ -65,6 +76,31 @@ def opt(inputs: dict) -> dict:
         'ID': ID
     }
 
+def opt_sol(inputs: dict) -> dict:
+    ID = get_param_id(inputs)
+    
+    commands = f"""set global lattice_calc_on = F
+set ele GSOL01 bs_field = {inputs['GSOL01']}
+set ele GSOL02 bs_field = {inputs['GSOL02']}
+set ele LI.SOL03 bs_field = {inputs['LI.SOL03']}
+set ele LI.SOL04 bs_field = {inputs['LI.SOL04']}
+set global lattice_calc_on = T
+set global track_type = beam
+write beam -at H3.END {BASE_PATH + RELATIVE_PATH + ID}.h5
+exit"""
+    
+    # Track the beam
+    P = track(inputs, ID, commands)
+    
+    # Calculate objectives
+    norm_emit_x, norm_emit_y = objective_sol(P)
+    
+    return {
+        'norm_emit_x': norm_emit_x,
+        'norm_emit_y': norm_emit_y,
+        'n_alive_ratio': P['n_alive']/P['n_particle'],
+        'ID': ID
+    }
 
 ############### test and main ###############
 def test(inputs: dict) -> dict:
@@ -86,7 +122,7 @@ def main():
     }
     
     print("Testing O_CAV optimization:")
-    result = opt(test_inputs)
+    result = opt_cav(test_inputs)
     print(f"Results: {result}")
     
     # Print optimization objectives

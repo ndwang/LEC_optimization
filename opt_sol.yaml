@@ -7,18 +7,18 @@ generator:
   output_path: temp
 
 evaluator:
-  function: lec_opt.opt_cav
+  function: lec_opt.opt_sol
   function_kwargs: {}
 
 vocs:
   variables:
-    phase: [-0.02, 0.02]
-    phase3: [0.45, 0.55]
-    voltage: [780e3, 880e3] # 800kV
-    voltage3: [350e3, 460e3] # 400kV
+    GSOL01: [0, 10]
+    GSOL02: [0, 10]
+    LI.SOL03: [0, 10]
+    LI.SOL04: [0, 10]
   constraints:
     n_alive_ratio: [GREATER_THAN, 0.95]
   objectives:
-    gamma_error: MINIMIZE
-    energy_spread: MINIMIZE
+    norm_emit_x: MINIMIZE
+    norm_emit_y: MINIMIZE
   constants: {}
